@@ -2,29 +2,28 @@
 #include "DXInstance.h"
 #include "BasicDraw.h"
 #include "Camera.h"
+#include "Object.h"
 
 class Application;
 
 //Resopnsible for rendering and presenting frames.
 class Renderer :
-	public virtual WindowInterface,
-	private DXWindowBase, //For swap chain
+	//public virtual WindowInterface,
+	public DXWindowBase, //For swap chain
 	private BasicDraw
 {
 public:
 	Renderer(UINT width, UINT height);
 	~Renderer();
 
-	void OnInit() final;
-	void OnUpdate() final;
-	void OnRender() final;
-	void OnDestroy() final;
-	void OnKeyDown(WPARAM wParam) final;
-	void OnKeyUp(WPARAM wParam) final;
-	void SetCursorPoint(POINT p, HCURSOR hCursor) final;
+	void OnInit();
+	void OnRender(BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_VIRTUAL_ADDRESS lightBufferView);
+	void OnDestroy();
+	//void SetCursorPoint(POINT p, HCURSOR hCursor);
 
 	/*void LoadGraphicsPipeline();
 	void LoadAssets();*/
+	void SetCameraConstants(CameraShaderConstants constants);
 private:
 	friend Application;
 	/*void WaitForPreviousFrame();
@@ -37,12 +36,4 @@ private:
 
 	ComPtr<ID3D12CommandAllocator> m_commandAllocator;
 	ComPtr<ID3D12GraphicsCommandList> m_commandList;
-
-	Camera m_camera;
-	XMFLOAT3 m_linearVelocity;
-	std::chrono::time_point<std::chrono::high_resolution_clock> m_time;
-	BOOL m_inputCaptured;
-	POINT m_cursorPos;
-	float m_mouseScaleFactor; //Sets angular velocity, will use fov to do this later
-	HCURSOR m_hCursor;
 };

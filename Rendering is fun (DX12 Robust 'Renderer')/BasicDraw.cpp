@@ -5,59 +5,19 @@ BasicDraw::BasicDraw() {}
 void BasicDraw::Load() {
 	CreateRootSignature();
 	CreatePipelineState();
-    CreateLightBuffer();
 }
 
-void BasicDraw::LoadObject(XMFLOAT4* vertices, UINT numVertices, XMMATRIX worldMatrix) {
-    PlacedObject placedObj = {};
-
-    UINT bufSize = 2*sizeof(XMFLOAT4) * numVertices;
-
-    CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufSize);
-    ThrowIfFailed(DXBase::m_device->CreateCommittedResource(
-        &heapProps,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&placedObj.m_vertices)
-    ));
-
-    UINT8* pVertexDataBegin;
-    CD3DX12_RANGE readRange(0, 0);
-    ThrowIfFailed(placedObj.m_vertices->Map(0, &readRange, reinterpret_cast<void**>(&pVertexDataBegin)));
-    memcpy(pVertexDataBegin, vertices, bufSize);
-    placedObj.m_vertices->Unmap(0, nullptr);
-
-    placedObj.m_worldMatrix = worldMatrix;
-    placedObj.m_numVertices = numVertices;
-    placedObj.m_vertexBufferView = {placedObj.m_vertices->GetGPUVirtualAddress(), bufSize, 2*sizeof(XMFLOAT4)};
-    m_objects.push_back(placedObj);
-}
-
-void BasicDraw::Draw(ID3D12GraphicsCommandList* pCommandList, RootConstants rootConstants, PointLight* lights, UINT numLights) {
-
-    {
-        UINT bufSize = sizeof(PointLight) * std::min(MAXLIGHTS,numLights);
-        UINT8* pData;
-        CD3DX12_RANGE readRange(0, 0);
-        ThrowIfFailed(m_lightBuffer->Map(0, &readRange, reinterpret_cast<void**>(&pData)));
-        memset(pData, 0, bufSize);
-        memcpy(pData, lights, bufSize);
-        m_lightBuffer->Unmap(0, nullptr);
-    }
+void BasicDraw::Draw(ID3D12GraphicsCommandList* pCommandList, BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_VIRTUAL_ADDRESS lightBufferView) {
 
     pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     pCommandList->SetPipelineState(m_pipelineState.Get());
     pCommandList->SetGraphicsRootSignature(m_rootSignature.Get());
-    pCommandList->SetGraphicsRoot32BitConstants(0, sizeof(RootConstants) / 4, &rootConstants, 0);
-    pCommandList->SetGraphicsRootConstantBufferView(1, m_lightBuffer->GetGPUVirtualAddress());
+    pCommandList->SetGraphicsRoot32BitConstants(0, sizeof(RootConstants) / 4, &m_rootConstants, 0);
+    pCommandList->SetGraphicsRootConstantBufferView(1, lightBufferView);
 
-    for (UINT i = 0; i < m_objects.size(); i++) {
-        PlacedObject curr = m_objects[i];
-        pCommandList->IASetVertexBuffers(0, 1, &curr.m_vertexBufferView);
-        pCommandList->DrawInstanced(curr.m_numVertices,1,0,0);
+    for (UINT i = 0; i < numObjects; i++) {
+        pCommandList->IASetVertexBuffers(0, 1, &pObjects[i].vertexView);
+        pCommandList->DrawInstanced(pObjects[i].nVertices,1,0,0);
     }
 }
 
@@ -130,19 +90,4 @@ void BasicDraw::CreateRootSignature() {
     ComPtr<ID3DBlob> errorBlob;
     ThrowIfFailed(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &rootSignatureBlob, &errorBlob));
     ThrowIfFailed(m_device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(), rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
-}
-
-void BasicDraw::CreateLightBuffer() {
-    UINT bufSize = sizeof(PointLight) * MAXLIGHTS;
-
-    CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-    CD3DX12_RESOURCE_DESC resourceDesc = CD3DX12_RESOURCE_DESC::Buffer(bufSize);
-    ThrowIfFailed(DXBase::m_device->CreateCommittedResource(
-        &heapProps,
-        D3D12_HEAP_FLAG_NONE,
-        &resourceDesc,
-        D3D12_RESOURCE_STATE_GENERIC_READ,
-        nullptr,
-        IID_PPV_ARGS(&m_lightBuffer)
-    ));
 }

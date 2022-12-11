@@ -52,6 +52,7 @@ using namespace Microsoft::WRL;
 #include <fstream>
 #include <stdlib.h>
 #include <cstdlib>
+#include <random>
 
 // From DXSampleHelper.h 
 // Source: https://github.com/Microsoft/DirectX-Graphics-Samples
@@ -63,6 +64,12 @@ inline void ThrowIfFailed(HRESULT hr)
         throw std::exception();
     }
 }
+
+struct CameraShaderConstants {
+    DirectX::XMMATRIX cameraMatrix;
+    DirectX::XMFLOAT4 viewDirection;
+    DirectX::XMFLOAT4 viewPosition;
+};
 
 constexpr WCHAR wndClassName[] = L"Window Class";
 
@@ -123,4 +130,9 @@ inline float dot(XMFLOAT2 x, XMFLOAT2 y) {
 struct PointLight {
     XMFLOAT4 pos;
     XMFLOAT4 color;
+};
+
+struct BasicRenderObject {
+    D3D12_VERTEX_BUFFER_VIEW vertexView;
+    UINT nVertices;
 };

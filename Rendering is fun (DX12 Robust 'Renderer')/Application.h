@@ -6,7 +6,7 @@ This class contains the window procedures.
 */
 class Application {
 public:
-	static int Run(HINSTANCE hInstance, int nCmdShow, UINT width, UINT height, WindowInterface* pInstance);
+	static int Run(HINSTANCE hInstance, int nCmdShow, UINT width, UINT height, DXWindowBase* pInstance);
 
 	static HWND GetHWND();
 protected:

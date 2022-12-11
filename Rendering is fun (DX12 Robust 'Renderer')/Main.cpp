@@ -14,7 +14,14 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
     freopen_s(&fDummy, "CONOUT$", "w", stderr);
     freopen_s(&fDummy, "CONOUT$", "w", stdout);
 
-    Renderer renderer = Renderer(initialWidth, initialHeight);
-    Application::Run(hInstance, nCmdShow, initialWidth, initialHeight, &renderer);
+
+    std::random_device rnd;
+    std::mt19937 gen(rnd());
+    std::uniform_real_distribution<float> dist(0.0f, 1.0f);
+
+
+    Game game(initialWidth, initialHeight);
+    //Renderer renderer = Renderer(initialWidth, initialHeight);
+    Application::Run(hInstance, nCmdShow, initialWidth, initialHeight, &game);
     return 0;
 }

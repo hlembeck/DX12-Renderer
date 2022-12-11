@@ -1,6 +1,6 @@
 #include "Application.h"
 
-int Application::Run(HINSTANCE hInstance, int nCmdShow, UINT width, UINT height, WindowInterface* pInstance) {
+int Application::Run(HINSTANCE hInstance, int nCmdShow, UINT width, UINT height, DXWindowBase* pInstance) {
 
 #if defined(_DEBUG)
 	ComPtr<ID3D12Debug> debugInterface;

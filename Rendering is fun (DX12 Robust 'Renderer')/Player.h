@@ -1,14 +1,18 @@
 #pragma once
 #include "Camera.h"
-#include "Movement.h"
 
-class Player :
-	private Camera,
-	private Movement
-{
+class Player : public Camera {
 public:
-	Player(float fovY, float aspectRatio, float nearZ, float farZ);
+	Player();
 	~Player();
+
+	void OnInit(float fovY, float aspectRatio, float nearZ, float farZ);
+	CameraShaderConstants GetCameraConstants();
+	void OnKeyDown(WPARAM wParam);
+	void OnKeyUp(WPARAM wParam);
+
+	void Move(float elapsedTime);
 private:
 	XMFLOAT3 m_position;
+	XMFLOAT3 m_linearVelocity;
 };

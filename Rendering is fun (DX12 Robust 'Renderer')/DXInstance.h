@@ -3,7 +3,16 @@
 
 constexpr UINT NUMFRAMES = 2;
 
-class DXBase {
+class RandomGenerator {
+	std::mt19937 m_gen;
+	std::uniform_real_distribution<float> m_dist;
+protected:
+	float Get();
+public:
+	RandomGenerator();
+};
+
+class DXBase : public virtual RandomGenerator {
 public:
 	DXBase();
 	~DXBase();
@@ -33,10 +42,10 @@ protected:
 
 class DXWindowBase :
 	public virtual DXBase,
-	private virtual WindowInterface //Needs width,height of window, but classes derived from DXWindowBase do not.
+	public WindowInterface
 {
 public:
-	DXWindowBase();
+	DXWindowBase(UINT width, UINT height);
 	virtual ~DXWindowBase();
 protected:
 	void CreateRenderTargets(ID3D12DescriptorHeap* rtvHeap, UINT descriptorSize);

@@ -12,11 +12,10 @@ public:
 	Camera(float fovY, float aspectRatio, float nearZ, float farZ);
 	~Camera();
 
+	virtual void OnInit(float fovY, float aspectRatio, float nearZ, float farZ);
+
 	void SetLens(float fovV, float ar, float zn, float zf);
-	void MoveForward(float dist);
-	void MoveSide(float dist);
 	void Move(XMFLOAT3 dist);
-	void MoveUp(float dist);
 
 	void Pitch(float angle);
 	void RotateWorldY(float angle);

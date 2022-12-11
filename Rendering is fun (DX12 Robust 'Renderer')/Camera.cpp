@@ -22,6 +22,15 @@ Camera::~Camera() {
 
 }
 
+void Camera::OnInit(float fovY, float aspectRatio, float nearZ, float farZ) {
+	m_position = { 0.0f,0.0f,-5.0f };
+	m_right = { 1.0f,0.0f,0.0f };
+	m_up = { 0.0f,1.0f,0.0f };
+	m_direction = { 0.0f,0.0f,1.0f };
+	SetLens(fovY, aspectRatio, nearZ, farZ);
+	UpdateViewMatrix();
+}
+
 void Camera::SetLens(float fovY, float aspectRatio, float nearZ, float farZ) {
 	m_fovY = fovY;
 	m_aspectRatio = aspectRatio;
@@ -39,20 +48,6 @@ void Camera::SetLens(float fovY, float aspectRatio, float nearZ, float farZ) {
 	for (int i = 0; i < 4; i++) {
 		printf("%g %g %g %g\n", mat.m[i][0], mat.m[i][1], mat.m[i][2], mat.m[i][3]);
 	}*/ //To verify that the correct matrix is produced
-}
-
-void Camera::MoveForward(float dist) {
-	m_position.x += m_direction.x * dist;
-	m_position.y += m_direction.y * dist;
-	m_position.z += m_direction.z * dist;
-	UpdateViewMatrix();
-}
-
-void Camera::MoveSide(float dist) {
-	m_position.x += m_right.x * dist;
-	m_position.y += m_right.y * dist;
-	m_position.z += m_right.z * dist;
-	UpdateViewMatrix();
 }
 
 void Camera::Move(XMFLOAT3 dist) {
@@ -120,9 +115,4 @@ XMFLOAT4 Camera::GetPosition() {
 XMFLOAT4 Camera::GetDirection() {
 	XMFLOAT4 direction = { m_direction.x, m_direction.y, m_direction.z, 0.0f };
 	return normalize(direction);
-}
-
-void Camera::MoveUp(float dist) {
-	m_position.y += dist;
-	UpdateViewMatrix();
 }

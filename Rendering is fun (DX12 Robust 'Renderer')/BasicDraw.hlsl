@@ -1,4 +1,4 @@
-static const uint MAXLIGHTS = 3;
+static const uint MAXLIGHTS = 2;
 static const float PI = 3.14159265f;
 
 struct RootConstants {

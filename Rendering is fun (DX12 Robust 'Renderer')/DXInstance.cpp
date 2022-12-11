@@ -1,5 +1,9 @@
 #include "DXInstance.h"
 
+RandomGenerator::RandomGenerator() : m_gen(std::random_device()()), m_dist(-1.0f,1.0f) {}
+
+float RandomGenerator::Get() { return m_dist(m_gen); }
+
 DXBase::DXBase() {}
 
 DXBase::~DXBase() {}
@@ -41,7 +45,7 @@ float WindowInterface::GetAspectRatio() {
     return m_aspectRatio;
 }
 
-DXWindowBase::DXWindowBase() {}
+DXWindowBase::DXWindowBase(UINT width, UINT height) : WindowInterface(width, height) {}
 
 DXWindowBase::~DXWindowBase() {
 

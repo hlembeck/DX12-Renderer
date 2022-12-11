@@ -135,11 +135,14 @@
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="DXInstance.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
-    <ClInclude Include="Movement.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Renderer.h" />
+    <ClInclude Include="Scene.h" />
     <ClInclude Include="Shared.h" />
+    <ClInclude Include="Terrain.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -147,10 +150,13 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DXInstance.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Movement.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Renderer.cpp" />
+    <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="Terrain.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="BasicDraw.hlsl">
