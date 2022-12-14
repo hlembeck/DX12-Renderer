@@ -7,7 +7,7 @@ Game::~Game() {}
 void Game::OnInit() {
 	Renderer::OnInit();
 	Player::OnInit(45.0f, WindowInterface::GetAspectRatio(), 0.1f, 100.0f);
-    Terrain::Load();
+    Terrain::Load(m_commandQueue.Get());
     Lights::Load();
 }
 
@@ -25,11 +25,13 @@ void Game::OnUpdate() {
         SetCursorPos(m_cursorPos.x, m_cursorPos.y);
     }
     Renderer::SetCameraConstants(Player::GetCameraConstants());
-    Lights::OnUpdate(elapsedTime*0.01f);
+    Lights::OnUpdate(elapsedTime*0.05f);
+    Terrain::Update(Player::GetPosition(), m_commandQueue.Get());
 }
 
 void Game::OnRender() {
-    Renderer::OnRender({ Terrain::GetRenderObject() }, 1, Lights::GetView());
+    BasicRenderObject pObjects[] = { Terrain::GetRenderObject() };
+    Renderer::OnRender(pObjects, 1, Lights::GetView());
 }
 
 void Game::OnKeyDown(WPARAM wParam) {

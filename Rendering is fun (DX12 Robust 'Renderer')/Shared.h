@@ -136,3 +136,8 @@ struct BasicRenderObject {
     D3D12_VERTEX_BUFFER_VIEW vertexView;
     UINT nVertices;
 };
+
+struct SimpleVertex {
+    XMFLOAT4 position;
+    XMFLOAT4 normal;
+};

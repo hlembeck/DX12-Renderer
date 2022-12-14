@@ -4,6 +4,12 @@ PLTest::PLTest(XMFLOAT4 initialPosition, XMFLOAT4 color) : m_wPosition(initialPo
     m_color = { (RandomGenerator::Get() + 1.0f) * 0.5f,(RandomGenerator::Get() + 1.0f) * 0.5f,(RandomGenerator::Get()+1.0f)*0.5f,0.0f };
 	m_sPosition = { RandomGenerator::Get(),RandomGenerator::Get() };
 	m_angularVelocity = { RandomGenerator::Get(),RandomGenerator::Get() };
+
+
+    //TESTING
+
+    m_wPosition = { RandomGenerator::Get()+10.0f,RandomGenerator::Get()+3.0f,RandomGenerator::Get()+10.0f,0.0f };
+
 }
 
 PointLight PLTest::GetLight() {

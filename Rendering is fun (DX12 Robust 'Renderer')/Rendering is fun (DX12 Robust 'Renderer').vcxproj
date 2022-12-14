@@ -135,6 +135,7 @@
     <ClInclude Include="d3dx12.h" />
     <ClInclude Include="DXInstance.h" />
     <ClInclude Include="Game.h" />
+    <ClInclude Include="HeightmapTerrainGen.h" />
     <ClInclude Include="Light.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Object.h" />
@@ -150,6 +151,7 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="DXInstance.cpp" />
     <ClCompile Include="Game.cpp" />
+    <ClCompile Include="HeightmapTerrainGen.cpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Object.cpp" />
@@ -160,6 +162,15 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="BasicDraw.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <FileType>Document</FileType>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="HeightMapTerrain.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Vertex</ShaderType>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Vertex</ShaderType>

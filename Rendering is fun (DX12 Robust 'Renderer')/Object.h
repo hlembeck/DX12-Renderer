@@ -1,11 +1,6 @@
 #pragma once
 #include "DXInstance.h"
 
-struct SimpleVertex {
-	XMFLOAT4 position;
-	XMFLOAT4 normal;
-};
-
 class SimpleMesh : public BasicRenderObject {
 public:
 	SimpleMesh();

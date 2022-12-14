@@ -1,7 +1,7 @@
 #pragma once
 #include "DXInstance.h"
 
-constexpr UINT MAXLIGHTS = 2;
+constexpr UINT MAXLIGHTS = 5;
 
 
 class PLTest : 

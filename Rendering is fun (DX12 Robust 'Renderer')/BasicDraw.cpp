@@ -8,10 +8,9 @@ void BasicDraw::Load() {
 }
 
 void BasicDraw::Draw(ID3D12GraphicsCommandList* pCommandList, BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_VIRTUAL_ADDRESS lightBufferView) {
-
-    pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     pCommandList->SetPipelineState(m_pipelineState.Get());
     pCommandList->SetGraphicsRootSignature(m_rootSignature.Get());
+    pCommandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
     pCommandList->SetGraphicsRoot32BitConstants(0, sizeof(RootConstants) / 4, &m_rootConstants, 0);
     pCommandList->SetGraphicsRootConstantBufferView(1, lightBufferView);
 
@@ -28,11 +27,17 @@ void BasicDraw::CreatePipelineState() {
 
     ThrowIfFailed(D3DCompileFromFile(L"BasicDraw.hlsl", NULL, NULL, "vsMain", "vs_5_1", compileFlags, 0, &vertexShader, NULL));
     ThrowIfFailed(D3DCompileFromFile(L"BasicDraw.hlsl", NULL, NULL, "psMain", "ps_5_1", compileFlags, 0, &pixelShader, NULL));
-    printf("test\n");
 
     D3D12_INPUT_ELEMENT_DESC inputElementDescs[] = {
         { "POSITION", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
         { "NORMAL", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 }
+    };
+
+    D3D12_DEPTH_STENCIL_DESC depthDesc = {
+        TRUE,
+        D3D12_DEPTH_WRITE_MASK_ALL,
+        D3D12_COMPARISON_FUNC_LESS,
+        FALSE
     };
 
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {
@@ -46,15 +51,17 @@ void BasicDraw::CreatePipelineState() {
         CD3DX12_BLEND_DESC(D3D12_DEFAULT),
         UINT_MAX,
         CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT),
-        {},
+        depthDesc,
         { inputElementDescs, _countof(inputElementDescs) },
         D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
         D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
         1
 	};
     psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+    psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;
     psoDesc.SampleDesc.Count = 1;
     ThrowIfFailed(m_device->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&m_pipelineState)));
+    m_pipelineState->SetName(L"Basic Draw PSO");
 }
 
 void BasicDraw::CreateRootSignature() {

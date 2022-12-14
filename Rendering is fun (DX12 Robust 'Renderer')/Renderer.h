@@ -25,6 +25,8 @@ public:
 	void LoadAssets();*/
 	void SetCameraConstants(CameraShaderConstants constants);
 private:
+	void CreateDepthBuffer();
+	void CreatePipelineState();
 	friend Application;
 	/*void WaitForPreviousFrame();
 	void FillCommandList();
@@ -36,4 +38,7 @@ private:
 
 	ComPtr<ID3D12CommandAllocator> m_commandAllocator;
 	ComPtr<ID3D12GraphicsCommandList> m_commandList;
+	ComPtr<ID3D12Resource> m_depthBuffer;
+	ComPtr<ID3D12DescriptorHeap> m_dsvHeap;
+	ComPtr<ID3D12PipelineState> m_pipelineState; //Don't want a PSO, but depth buffer clearing requires one
 };
