@@ -51,9 +51,12 @@ void Camera::SetLens(float fovY, float aspectRatio, float nearZ, float farZ) {
 }
 
 void Camera::Move(XMFLOAT3 dist) {
-	m_position.x += m_right.x * dist.x + m_up.x * dist.y + m_direction.x * dist.z;
+	/*m_position.x += m_right.x * dist.x + m_up.x * dist.y + m_direction.x * dist.z;
 	m_position.y += m_right.y * dist.x + m_up.y * dist.y + m_direction.y * dist.z;
-	m_position.z += m_right.z * dist.x + m_up.z * dist.y + m_direction.z * dist.z;
+	m_position.z += m_right.z * dist.x + m_up.z * dist.y + m_direction.z * dist.z;*/
+	m_position.x += m_right.x * dist.x + m_direction.x * dist.z;
+	m_position.y += m_right.y * dist.x + m_up.y * dist.y + m_direction.y * dist.z;
+	m_position.z += m_right.z * dist.x + m_direction.z * dist.z;
 	UpdateViewMatrix();
 }
 

@@ -8,7 +8,7 @@ PLTest::PLTest(XMFLOAT4 initialPosition, XMFLOAT4 color) : m_wPosition(initialPo
 
     //TESTING
 
-    m_wPosition = { RandomGenerator::Get()+10.0f,RandomGenerator::Get()+3.0f,RandomGenerator::Get()+10.0f,0.0f };
+    m_wPosition = { RandomGenerator::Get(),RandomGenerator::Get()+5.0f,RandomGenerator::Get(),0.0f };
 
 }
 
@@ -20,11 +20,12 @@ XMFLOAT4 PLTest::GetPosition() {
 	return {3.0f*sin(m_sPosition.x)*cos(m_sPosition.y)+ m_wPosition.x,3.0f*sin(m_sPosition.x)*sin(m_sPosition.y)+m_wPosition.y,3.0f*cos(m_sPosition.y)+m_wPosition.z,1.0f};
 }
 
-void PLTest::UpdatePosition(float elapsedTime) {
+void PLTest::UpdatePosition(float elapsedTime, XMFLOAT4 pos) {
 	m_sPosition.x += m_angularVelocity.x*elapsedTime;
 	m_sPosition.y += m_angularVelocity.y*elapsedTime;
 	m_angularVelocity.x += RandomGenerator::Get();
 	m_angularVelocity.y += RandomGenerator::Get();
+    m_wPosition = pos;
 }
 
 Lights::Lights() : m_pointLights() {}
@@ -44,11 +45,12 @@ void Lights::Load() {
     ));
 }
 
-void Lights::OnUpdate(float elapsedTime) {
+void Lights::OnUpdate(float elapsedTime, XMFLOAT4 pos) {
 
     PointLight lights[MAXLIGHTS] = {};
 
     for (UINT i = 0; i < MAXLIGHTS; i++) {
+        m_pointLights[i].UpdatePosition(elapsedTime, pos);
         lights[i] = m_pointLights[i].GetLight();
     }
 
@@ -59,10 +61,6 @@ void Lights::OnUpdate(float elapsedTime) {
     memset(pData, 0, bufSize);
     memcpy(pData, lights, bufSize);
     m_lightBuffer->Unmap(0, nullptr);
-
-    for (UINT i = 0; i < MAXLIGHTS; i++) {
-        m_pointLights[i].UpdatePosition(elapsedTime);
-    }
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS Lights::GetView() { return m_lightBuffer->GetGPUVirtualAddress(); }

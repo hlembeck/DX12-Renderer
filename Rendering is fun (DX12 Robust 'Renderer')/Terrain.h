@@ -9,7 +9,7 @@ public:
 	Terrain();
 
 	void Load(ID3D12CommandQueue* commandQueue);
-	void Update(XMFLOAT4 position, ID3D12CommandQueue* commandQueue);
+	void Update(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
 
 	BasicRenderObject GetRenderObject();
 private:

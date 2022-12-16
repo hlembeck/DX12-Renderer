@@ -4,7 +4,7 @@ struct SimpleVertex {
 };
 
 struct Constants {
-	float position;
+	float2 position;
 	float d;
 };
 
@@ -28,21 +28,23 @@ float DotGrid(float2 pos, int2 tex) {
 }
 
 float GetHeight(float2 pos) {
-	int2 texCoords = pos;
-	float d1 = DotGrid(pos, texCoords);
-	float d2 = DotGrid(pos, int2(texCoords.x + 1, texCoords.y));
-	float height = Interpolate(d1, d2, pos.x - texCoords.x);
+	int2 texCoords = floor(pos);
+	pos -= texCoords;
+	texCoords.x &= 255;
+	texCoords.y &= 255;
 
-	d1 = DotGrid(pos, int2(texCoords.x, texCoords.y + 1));
-	d2 = DotGrid(pos, int2(texCoords.x + 1, texCoords.y + 1));
-	height = Interpolate(height, Interpolate(d1, d2, pos.x - texCoords.x), pos.y - texCoords.y);
+	float d1 = dot(pos, gTexture.Load(float3(texCoords, 0)));
+	float d2 = dot(float2(pos.x-1.0f, pos.y), gTexture.Load(float3(texCoords.x+1, texCoords.y, 0)));
+	float d3 = dot(float2(pos.x, pos.y - 1.0f), gTexture.Load(float3(texCoords.x, texCoords.y + 1, 0)));
+	float d4 = dot(float2(pos.x - 1.0f, pos.y - 1.0f), gTexture.Load(float3(texCoords.x + 1, texCoords.y + 1, 0)));
 
-	return height;
+	return Interpolate(Interpolate(d1, d2, pos.x), Interpolate(d3, d4, pos.x), pos.y);
 }
 
 [numthreads(512, 1, 1)]
 void main(int3 dispatchThreadID : SV_DispatchThreadID) // Thread ID
 {
+	Vertices[dispatchThreadID.x].pos.xz += rootConstants.position;
 	Vertices[dispatchThreadID.x].pos.y = GetHeight(Vertices[dispatchThreadID.x].pos.xz);
 
 	float3 pos = Vertices[dispatchThreadID.x].pos.xyz;

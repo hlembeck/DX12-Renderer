@@ -1,6 +1,6 @@
 #include "HeightmapTerrainGen.h"
 
-HeightmapTerrain::HeightmapTerrain(UINT quality) : m_quality(std::max((UINT)2,quality)) {}
+HeightmapTerrain::HeightmapTerrain(UINT quality) : m_quality(std::max((UINT)2,quality)), m_pos({0.0f,0.0f}) {}
 
 void HeightmapTerrain::Load(ID3D12CommandQueue* commandQueue) {
     ThrowIfFailed(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
@@ -18,7 +18,7 @@ void HeightmapTerrain::Load(ID3D12CommandQueue* commandQueue) {
 
     Wait(commandQueue);
 
-    nVertices = 6 * (m_quality - 1) * (m_quality - 1) * 65536;
+    nVertices = 6 * (m_quality - 1) * (m_quality - 1) * 1024;
     CreateDescriptorHeap();
     LoadTexture(commandQueue);
     LoadVertices();
@@ -144,7 +144,7 @@ void HeightmapTerrain::LoadTexture(ID3D12CommandQueue* commandQueue) {
     }
 }
 
-void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* commandQueue) {
+void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue) {
     {
         ThrowIfFailed(m_commandAllocator->Reset());
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get()));
@@ -154,9 +154,13 @@ void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* comm
         m_commandList->SetDescriptorHeaps(1, pHeaps);
 
         float d = 1.0f / (m_quality - 1);
-
-        m_commandList->SetComputeRoot32BitConstants(0, 1, &position, 0);
-        m_commandList->SetComputeRoot32BitConstants(0, 1, &d, 1);
+        position.x = std::floor(position.x);
+        position.z = std::floor(position.z);
+        XMFLOAT2 pos = {  position.x-m_pos.x,position.z - m_pos.y };
+        m_commandList->SetComputeRoot32BitConstants(0, 2, &pos, 0);
+        m_pos.x = position.x;
+        m_pos.y = position.z;
+        m_commandList->SetComputeRoot32BitConstants(0, 1, &d, 2);
         m_commandList->SetComputeRootDescriptorTable(1,m_srvHeap->GetGPUDescriptorHandleForHeapStart());
         m_commandList->SetComputeRootUnorderedAccessView(2, m_vertices->GetGPUVirtualAddress());
 
@@ -228,8 +232,8 @@ void HeightmapTerrain::LoadVertices() {
     memset(vertices, 0, sizeof(SimpleVertex) * nVertices);
     float d = 1.0f / (m_quality-1);
     UINT index = 0;
-    for (float i = 0; i < 256.0f; i++) {
-        for (float j = 0; j < 256.0f; j++) {
+    for (float i = -16.0f; i < 16.0f; i++) {
+        for (float j = -16.0f; j < 16.0f; j++) {
             LoadVertexSquare(i,j,vertices,index,m_quality);
         }
     }
@@ -272,7 +276,7 @@ void HeightmapTerrain::CreateRootSignature() {
     };
 
     CD3DX12_ROOT_PARAMETER rootParameters[3] = {};
-    rootParameters[0].InitAsConstants(2, 0);
+    rootParameters[0].InitAsConstants(3, 0);
     rootParameters[1].InitAsDescriptorTable(1,&range);
     rootParameters[2].InitAsUnorderedAccessView(0);
 
@@ -283,7 +287,7 @@ void HeightmapTerrain::CreateRootSignature() {
     ThrowIfFailed(m_device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(), rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 }
 
-void HeightmapTerrain::Wait(ID3D12CommandQueue* commandQueue) {
+void HeightmapTerrain::Wait(ID3D12CommandQueue* const commandQueue) {
     const UINT64 fence = m_fenceValue;
     ThrowIfFailed(commandQueue->Signal(m_fence.Get(), fence));
     m_fenceValue++;
@@ -293,7 +297,7 @@ void HeightmapTerrain::Wait(ID3D12CommandQueue* commandQueue) {
     }
 }
 
-void HeightmapTerrain::ExecuteCommandList(ID3D12CommandQueue* commandQueue) {
+void HeightmapTerrain::ExecuteCommandList(ID3D12CommandQueue* const commandQueue) {
     ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
     commandQueue->ExecuteCommandLists(1, ppCommandList);
     Wait(commandQueue);

@@ -10,7 +10,7 @@ class HeightmapTerrain :
 public:
 	HeightmapTerrain(UINT quality = 2);
 	void Load(ID3D12CommandQueue* commandQueue);
-	void UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* commandQueue);
+	void UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
 	void LinkDevice(ComPtr<ID3D12Device> device);
 //protected:
 //	void Load(ID3D12CommandQueue* commandQueue);
@@ -20,8 +20,8 @@ private:
 	void CreatePipelineState();
 	void LoadVertices();
 	void CreateRootSignature();
-	void Wait(ID3D12CommandQueue* commandQueue);
-	void ExecuteCommandList(ID3D12CommandQueue* commandQueue);
+	void Wait(ID3D12CommandQueue* const commandQueue);
+	void ExecuteCommandList(ID3D12CommandQueue* const commandQueue);
 	void CreateDescriptorHeap();
 	UINT m_quality;
 	ComPtr<ID3D12Resource> m_randomTexture;
@@ -36,4 +36,6 @@ private:
 	UINT64 m_fenceValue;
 	HANDLE m_fenceEvent;
 	ComPtr<ID3D12Fence> m_fence;
+
+	XMFLOAT2 m_pos;
 };

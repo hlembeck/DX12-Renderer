@@ -1,6 +1,6 @@
 #include "Terrain.h"
 
-Terrain::Terrain() : m_terrain(4) {}
+Terrain::Terrain() : m_terrain(5) {}
 
 void Terrain::Load(ID3D12CommandQueue* commandQueue) {
     SimpleVertex vertices[6] = {
@@ -18,8 +18,8 @@ void Terrain::Load(ID3D12CommandQueue* commandQueue) {
     m_terrain.UpdateTerrain({0.0f,0.0f,0.0f,0.0f}, commandQueue);
 }
 
-void Terrain::Update(XMFLOAT4 position, ID3D12CommandQueue* commandQueue) {
-    //m_terrain.UpdateTerrain(position, commandQueue);
+void Terrain::Update(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue) {
+    m_terrain.UpdateTerrain(position, commandQueue);
 }
 
 BasicRenderObject Terrain::GetRenderObject() {

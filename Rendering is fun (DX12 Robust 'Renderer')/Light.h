@@ -10,7 +10,7 @@ public:
 	PLTest(XMFLOAT4 initialPosition = {}, XMFLOAT4 color = {});
 
 	PointLight GetLight();
-	void UpdatePosition(float elapsedTime);
+	void UpdatePosition(float elapsedTime, XMFLOAT4 pos);
 private:
 	XMFLOAT4 GetPosition();
 	XMFLOAT4 m_wPosition;
@@ -26,7 +26,7 @@ protected:
 	Lights();
 
 	void Load();
-	void OnUpdate(float elapsedTime);
+	void OnUpdate(float elapsedTime, XMFLOAT4 pos);
 	D3D12_GPU_VIRTUAL_ADDRESS GetView();
 private:
 	PLTest m_pointLights[MAXLIGHTS];
