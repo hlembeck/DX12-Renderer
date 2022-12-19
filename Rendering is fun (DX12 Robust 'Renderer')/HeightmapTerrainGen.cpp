@@ -2,7 +2,7 @@
 
 HeightmapTerrain::HeightmapTerrain(UINT quality) : m_quality(std::max((UINT)2,quality)), m_pos({0.0f,0.0f}) {}
 
-void HeightmapTerrain::Load(ID3D12CommandQueue* commandQueue) {
+void HeightmapTerrain::Load() {
     ThrowIfFailed(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
     ThrowIfFailed(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator.Get(), NULL, IID_PPV_ARGS(&m_commandList)));
     ThrowIfFailed(m_commandList->Close());
@@ -16,21 +16,22 @@ void HeightmapTerrain::Load(ID3D12CommandQueue* commandQueue) {
         ThrowIfFailed(HRESULT_FROM_WIN32(GetLastError()));
     }
 
-    Wait(commandQueue);
+    Wait();
 
     nVertices = 6 * (m_quality - 1) * (m_quality - 1) * 1024;
     CreateDescriptorHeap();
-    LoadTexture(commandQueue);
+    LoadTexture();
     LoadVertices();
     CreateRootSignature();
     CreatePipelineState();
 }
 
-void HeightmapTerrain::LinkDevice(ComPtr<ID3D12Device> device) {
+void HeightmapTerrain::LinkDevice(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue) {
     m_device = device;
+    m_commandQueue = commandQueue;
 }
 
-void HeightmapTerrain::LoadTexture(ID3D12CommandQueue* commandQueue) {
+void HeightmapTerrain::LoadTexture() {
     D3D12_RESOURCE_DESC resourceDesc = {
         D3D12_RESOURCE_DIMENSION_TEXTURE2D,
         0,
@@ -123,8 +124,8 @@ void HeightmapTerrain::LoadTexture(ID3D12CommandQueue* commandQueue) {
             m_commandList->ResourceBarrier(1, &resourceBarrier);
             m_commandList->Close();
         }
-        ExecuteCommandList(commandQueue);
-        Wait(commandQueue);
+        ExecuteCommandList();
+        Wait();
     }
 
     {
@@ -144,7 +145,7 @@ void HeightmapTerrain::LoadTexture(ID3D12CommandQueue* commandQueue) {
     }
 }
 
-void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue) {
+void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position) {
     {
         ThrowIfFailed(m_commandAllocator->Reset());
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), m_pipelineState.Get()));
@@ -169,8 +170,8 @@ void HeightmapTerrain::UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* cons
         ThrowIfFailed(m_commandList->Close());
     }
 
-    ExecuteCommandList(commandQueue);
-    Wait(commandQueue);
+    ExecuteCommandList();
+    Wait();
 }
 
 void HeightmapTerrain::CreatePipelineState() {
@@ -287,9 +288,9 @@ void HeightmapTerrain::CreateRootSignature() {
     ThrowIfFailed(m_device->CreateRootSignature(0, rootSignatureBlob->GetBufferPointer(), rootSignatureBlob->GetBufferSize(), IID_PPV_ARGS(&m_rootSignature)));
 }
 
-void HeightmapTerrain::Wait(ID3D12CommandQueue* const commandQueue) {
+void HeightmapTerrain::Wait() {
     const UINT64 fence = m_fenceValue;
-    ThrowIfFailed(commandQueue->Signal(m_fence.Get(), fence));
+    ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), fence));
     m_fenceValue++;
     if (m_fence->GetCompletedValue() < fence) {
         ThrowIfFailed(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
@@ -297,10 +298,10 @@ void HeightmapTerrain::Wait(ID3D12CommandQueue* const commandQueue) {
     }
 }
 
-void HeightmapTerrain::ExecuteCommandList(ID3D12CommandQueue* const commandQueue) {
+void HeightmapTerrain::ExecuteCommandList() {
     ID3D12CommandList* ppCommandList[] = { m_commandList.Get() };
-    commandQueue->ExecuteCommandLists(1, ppCommandList);
-    Wait(commandQueue);
+    m_commandQueue->ExecuteCommandLists(1, ppCommandList);
+    Wait();
 }
 
 void HeightmapTerrain::CreateDescriptorHeap() {

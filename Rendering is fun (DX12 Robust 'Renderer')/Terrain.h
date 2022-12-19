@@ -8,8 +8,8 @@ class Terrain :
 public:
 	Terrain();
 
-	void Load(ID3D12CommandQueue* commandQueue);
-	void Update(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
+	void Load();
+	void Update(XMFLOAT4 position);
 
 	BasicRenderObject GetRenderObject();
 private:

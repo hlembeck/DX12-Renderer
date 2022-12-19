@@ -9,16 +9,16 @@ class HeightmapTerrain :
 {
 public:
 	HeightmapTerrain(UINT quality = 2);
-	void Load(ID3D12CommandQueue* commandQueue);
-	void UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
-	void LinkDevice(ComPtr<ID3D12Device> device);
+	void Load();
+	void UpdateTerrain(XMFLOAT4 position);
+	void LinkDevice(ComPtr<ID3D12Device> device, ComPtr<ID3D12CommandQueue> commandQueue);
 private:
-	void LoadTexture(ID3D12CommandQueue* commandQueue);
+	void LoadTexture();
 	void CreatePipelineState();
 	void LoadVertices();
 	void CreateRootSignature();
-	void Wait(ID3D12CommandQueue* const commandQueue);
-	void ExecuteCommandList(ID3D12CommandQueue* const commandQueue);
+	void Wait();
+	void ExecuteCommandList();
 	void CreateDescriptorHeap();
 	UINT m_quality;
 	ComPtr<ID3D12Resource> m_randomTexture;

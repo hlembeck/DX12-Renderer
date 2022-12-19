@@ -20,6 +20,7 @@ protected:
 	void GetAdapter(IDXGIFactory1* pFactory, IDXGIAdapter1** ppAdapter);
 	void CreateDevice(IDXGIFactory4* factory);
 	ComPtr<ID3D12Device> m_device;
+	ComPtr<ID3D12CommandQueue> m_commandQueue;
 };
 
 class WindowInterface {
@@ -53,7 +54,6 @@ protected:
 	void CreateFence();
 	HRESULT Present();
 	void WaitForPreviousFrame();
-	ComPtr<ID3D12CommandQueue> m_commandQueue;
 	ComPtr<ID3D12Resource> m_renderTargets[NUMFRAMES];
 	UINT m_frameIndex;
 	CD3DX12_RECT m_scissorRect;

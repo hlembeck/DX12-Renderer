@@ -18,19 +18,10 @@ public:
 	void OnInit();
 	void OnRender(BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_VIRTUAL_ADDRESS lightBufferView);
 	void OnDestroy();
-	//void SetCursorPoint(POINT p, HCURSOR hCursor);
-
-	/*void LoadGraphicsPipeline();
-	void LoadAssets();*/
 	void SetCameraConstants(CameraShaderConstants constants);
 private:
 	void CreateDepthBuffer();
-	void CreatePipelineState();
 	friend Application;
-	/*void WaitForPreviousFrame();
-	void FillCommandList();
-	void CreateRootSignature();
-	void CreatePipelineState();*/
 
 	ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
 	UINT m_rtvDescriptorSize;

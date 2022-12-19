@@ -9,7 +9,7 @@ class Scene :
 public:
 	Scene();
 
-	void Update(float elapsedTime, XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
+	void Update(float elapsedTime, XMFLOAT4 position);
 
 	~Scene();
 };

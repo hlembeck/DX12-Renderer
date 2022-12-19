@@ -7,7 +7,7 @@ Game::~Game() {}
 void Game::OnInit() {
 	Renderer::OnInit();
 	Player::OnInit(45.0f, WindowInterface::GetAspectRatio(), 0.1f, 100.0f);
-    Terrain::Load(m_commandQueue.Get());
+    Terrain::Load();
     Lights::Load();
     m_time = std::chrono::high_resolution_clock::now();
 }
@@ -26,7 +26,7 @@ void Game::OnUpdate() {
         SetCursorPos(m_cursorPos.x, m_cursorPos.y);
     }
     Renderer::SetCameraConstants(Player::GetCameraConstants());
-    Scene::Update(elapsedTime, Player::GetPosition(), m_commandQueue.Get());
+    Scene::Update(elapsedTime, Player::GetPosition());
 }
 
 void Game::OnRender() {
