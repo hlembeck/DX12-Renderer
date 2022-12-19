@@ -1,5 +1,5 @@
 #pragma once
-#include "DXInstance.h"
+#include "TextureGen.h"
 
 class SimpleMesh : public BasicRenderObject {
 public:

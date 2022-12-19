@@ -1,5 +1,4 @@
 #pragma once
-#include "DXInstance.h"
 #include "BasicDraw.h"
 #include "Camera.h"
 #include "Object.h"

@@ -12,9 +12,6 @@ public:
 	void Load(ID3D12CommandQueue* commandQueue);
 	void UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* const commandQueue);
 	void LinkDevice(ComPtr<ID3D12Device> device);
-//protected:
-//	void Load(ID3D12CommandQueue* commandQueue);
-//	void UpdateTerrain(XMFLOAT4 position, ID3D12CommandQueue* commandQueue);
 private:
 	void LoadTexture(ID3D12CommandQueue* commandQueue);
 	void CreatePipelineState();

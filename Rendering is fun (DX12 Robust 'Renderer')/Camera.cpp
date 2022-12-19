@@ -1,7 +1,7 @@
 #include "Camera.h"
 
 Camera::Camera() {
-	m_position = { 0.0f,0.0f,-5.0f };
+	m_position = { 0.0f,0.0f,0.0f };
 	m_right = { 1.0f,0.0f,0.0f };
 	m_up = { 0.0f,1.0f,0.0f };
 	m_direction = { 0.0f,0.0f,1.0f };
@@ -55,7 +55,7 @@ void Camera::Move(XMFLOAT3 dist) {
 	m_position.y += m_right.y * dist.x + m_up.y * dist.y + m_direction.y * dist.z;
 	m_position.z += m_right.z * dist.x + m_up.z * dist.y + m_direction.z * dist.z;*/
 	m_position.x += m_right.x * dist.x + m_direction.x * dist.z;
-	m_position.y += m_right.y * dist.x + m_up.y * dist.y + m_direction.y * dist.z;
+	m_position.y += m_right.y * dist.x + dist.y + m_direction.y * dist.z;
 	m_position.z += m_right.z * dist.x + m_direction.z * dist.z;
 	UpdateViewMatrix();
 }

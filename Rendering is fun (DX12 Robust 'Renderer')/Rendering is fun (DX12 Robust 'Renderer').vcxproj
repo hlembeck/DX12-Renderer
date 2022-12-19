@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -137,6 +137,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="HeightmapTerrainGen.h" />
     <ClInclude Include="Light.h" />
+    <ClInclude Include="LightPerspectiveDepthGen.h" />
     <ClInclude Include="Main.h" />
     <ClInclude Include="Object.h" />
     <ClInclude Include="Player.h" />
@@ -144,6 +145,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="Shared.h" />
     <ClInclude Include="Terrain.h" />
+    <ClInclude Include="TextureGen.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Application.cpp" />
@@ -159,6 +161,7 @@
     <ClCompile Include="Renderer.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="Terrain.cpp" />
+    <ClCompile Include="TextureGen.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="BasicDraw.hlsl">

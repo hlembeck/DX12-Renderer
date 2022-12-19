@@ -84,6 +84,12 @@
     <ClInclude Include="HeightmapTerrainGen.h">
       <Filter>Header Files\Scene</Filter>
     </ClInclude>
+    <ClInclude Include="LightPerspectiveDepthGen.h">
+      <Filter>Header Files\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureGen.h">
+      <Filter>Header Files\Shared</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Main.cpp">
@@ -124,6 +130,9 @@
     </ClCompile>
     <ClCompile Include="HeightmapTerrainGen.cpp">
       <Filter>Source Files\Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureGen.cpp">
+      <Filter>Source Files\Shared</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
