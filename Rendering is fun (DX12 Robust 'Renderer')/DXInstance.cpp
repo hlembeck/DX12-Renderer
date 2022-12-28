@@ -128,11 +128,18 @@ HRESULT DXWindowBase::Present() {
 }
 
 void DXWindowBase::WaitForPreviousFrame() {
-    const UINT64 fence = m_fenceValue;
+    /*const UINT64 fence = m_fenceValue;
     ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), fence));
     m_fenceValue++;
     if (m_fence->GetCompletedValue() < fence) {
         ThrowIfFailed(m_fence->SetEventOnCompletion(fence, m_fenceEvent));
+        WaitForSingleObject(m_fenceEvent, INFINITE);
+    }
+    m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();*/
+    m_fenceValue++;
+    ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
+    if (m_fence->GetCompletedValue() < m_fenceValue) {
+        ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent));
         WaitForSingleObject(m_fenceEvent, INFINITE);
     }
     m_frameIndex = m_swapChain->GetCurrentBackBufferIndex();

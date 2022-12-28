@@ -32,8 +32,8 @@ HRESULT GetTexture3D(ComPtr<ID3D12Resource>& resource, ID3D12Device* const devic
 	return device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &resourceDesc, initialState, clearVal, IID_PPV_ARGS(&resource));
 }
 
-RandomTextureGen::RandomTextureGen() {}
-
-HRESULT RandomTextureGen::GetTexture2D(ComPtr<ID3D12Resource>& resource, const UINT width, const UINT height, const UINT arrayDepth, const DXGI_FORMAT format, const D3D12_RESOURCE_STATES initialState, const D3D12_RESOURCE_FLAGS flags) {
-	return (HRESULT)0;
-}
+//RandomTextureGen::RandomTextureGen(DXGI_FORMAT format) : m_format(format) {}
+//
+//HRESULT RandomTextureGen::GetTexture2D(ComPtr<ID3D12Resource>& resource, const UINT width, const UINT height, const UINT arrayDepth, const D3D12_RESOURCE_STATES initialState, const D3D12_RESOURCE_FLAGS flags) {
+//	HRESULT ret = GetTexture2D(resource, width, height, arrayDepth, m_format, initialState, flags);
+//}

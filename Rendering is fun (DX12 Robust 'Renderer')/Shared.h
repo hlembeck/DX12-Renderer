@@ -128,7 +128,7 @@ inline float dot(XMFLOAT2 x, XMFLOAT2 y) {
 }
 
 struct PointLight {
-    XMFLOAT4 pos;
+    XMFLOAT4 position;
     XMFLOAT4 color;
 };
 

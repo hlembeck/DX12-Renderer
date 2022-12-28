@@ -1,7 +1,7 @@
 #include "Renderer.h"
 #include "Application.h"
 
-Renderer::Renderer(UINT width, UINT height) : DXWindowBase(width, height) {}
+Renderer::Renderer(UINT width, UINT height) : DXWindowBase(width, height), m_fenceValue(0) {}
 
 Renderer::~Renderer() {}
 
@@ -27,13 +27,63 @@ void Renderer::OnInit() {
     ThrowIfFailed(m_device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&m_commandAllocator)));
     ThrowIfFailed(m_device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, m_commandAllocator.Get(), NULL, IID_PPV_ARGS(&m_commandList)));
     ThrowIfFailed(m_commandList->Close());
+
+
+    m_device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&m_fence));
 }
 
 void Renderer::SetCameraConstants(CameraShaderConstants constants) {
     BasicDraw::m_rootConstants = constants;
 }
 
+void Renderer::ResetCommandList() {
+    ThrowIfFailed(m_commandAllocator->Reset());
+    ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), NULL));
+}
+
+void Renderer::FlushCommandList() {
+    ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
+    DXWindowBase::m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+    m_fenceValue++;
+    ThrowIfFailed(m_commandQueue->Signal(m_fence.Get(), m_fenceValue));
+    if (m_fence->GetCompletedValue() < m_fenceValue) {
+        ThrowIfFailed(m_fence->SetEventOnCompletion(m_fenceValue, m_fenceEvent));
+        WaitForSingleObject(m_fenceEvent, INFINITE);
+    }
+}
+
 void Renderer::OnRender(BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_VIRTUAL_ADDRESS lightBufferView) {
+    { //Reset the command list, and set it up for the render target
+        m_commandList->RSSetViewports(1, &m_viewport);
+        m_commandList->RSSetScissorRects(1, &m_scissorRect);
+        CD3DX12_RESOURCE_BARRIER resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_PRESENT, D3D12_RESOURCE_STATE_RENDER_TARGET);
+        m_commandList->ResourceBarrier(1, &resourceBarrier);
+
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(m_rtvHeap->GetCPUDescriptorHandleForHeapStart(), m_frameIndex, m_rtvDescriptorSize);
+        D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = m_dsvHeap->GetCPUDescriptorHandleForHeapStart();
+        m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, &dsvHandle);
+        const float clearColor[] = { 0.0f, 0.0f, 0.0f, 1.0f };
+        m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+        m_commandList->ClearDepthStencilView(m_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+
+        BasicDraw::Draw(m_commandList.Get(), pObjects, numObjects, lightBufferView);
+
+        //Setup for presenting
+        resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
+        m_commandList->ResourceBarrier(1, &resourceBarrier);
+        ThrowIfFailed(m_commandList->Close());
+    }
+
+    // Execute the command list.
+    ID3D12CommandList* ppCommandLists[] = { m_commandList.Get() };
+    DXWindowBase::m_commandQueue->ExecuteCommandLists(_countof(ppCommandLists), ppCommandLists);
+
+    // Present the frame.
+    Present();
+    WaitForPreviousFrame();
+}
+
+void Renderer::RenderWithRobustLight(BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_DESCRIPTOR_HANDLE depthCubeMap, ID3D12DescriptorHeap** pHeaps, D3D12_GPU_VIRTUAL_ADDRESS cameraView, PointLight pl) {
     { //Reset the command list, and set it up for the render target
         ThrowIfFailed(m_commandAllocator->Reset());
         ThrowIfFailed(m_commandList->Reset(m_commandAllocator.Get(), NULL));
@@ -49,7 +99,9 @@ void Renderer::OnRender(BasicRenderObject* pObjects, UINT numObjects, D3D12_GPU_
         m_commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
         m_commandList->ClearDepthStencilView(m_dsvHeap->GetCPUDescriptorHandleForHeapStart(), D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
 
-        BasicDraw::Draw(m_commandList.Get(), pObjects, numObjects, lightBufferView);
+        m_commandList->SetDescriptorHeaps(1, pHeaps);
+
+        BasicDraw::DrawWithShadow(m_commandList.Get(), pObjects, numObjects, depthCubeMap, cameraView, pl);
 
         //Setup for presenting
         resourceBarrier = CD3DX12_RESOURCE_BARRIER::Transition(m_renderTargets[m_frameIndex].Get(), D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PRESENT);
@@ -86,6 +138,8 @@ void Renderer::CreateDepthBuffer() {
     depthStencilDesc.Format = DXGI_FORMAT_D32_FLOAT;
     depthStencilDesc.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D;
     depthStencilDesc.Flags = D3D12_DSV_FLAG_NONE;
+
+    depthStencilDesc.Texture2D = {0};
 
     m_depthBuffer->SetName(L"Depth Buffer");
 

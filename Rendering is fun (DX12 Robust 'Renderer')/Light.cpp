@@ -64,3 +64,7 @@ void Lights::OnUpdate(float elapsedTime, XMFLOAT4 pos) {
 }
 
 D3D12_GPU_VIRTUAL_ADDRESS Lights::GetView() { return m_lightBuffer->GetGPUVirtualAddress(); }
+
+RobustLight::RobustLight(XMFLOAT4 pos, XMFLOAT4 color) :  LightPerspectiveDepthMap(pos,color) {}
+
+void RobustLight::UpdatePosition(XMFLOAT4 pos) { position = pos; }

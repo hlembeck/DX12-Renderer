@@ -3,7 +3,7 @@
 #include "Terrain.h"
 
 class Scene :
-	public Lights,
+	public LightPerspectiveDepthMap,
 	public Terrain
 {
 public:

@@ -134,12 +134,21 @@
     <ClCompile Include="TextureGen.cpp">
       <Filter>Source Files\Shared</Filter>
     </ClCompile>
+    <ClCompile Include="LightPerspectiveDepthMap.cpp">
+      <Filter>Source Files\Render</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="BasicDraw.hlsl">
       <Filter>Resource Files</Filter>
     </CustomBuild>
     <CustomBuild Include="HeightMapTerrain.hlsl">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="LightPerspectiveDepthMap.hlsl">
+      <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RobustLightDraw.hlsl">
       <Filter>Resource Files</Filter>
     </CustomBuild>
   </ItemGroup>
